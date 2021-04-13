@@ -3,13 +3,9 @@ title: API Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
   - shell
-  - ruby
-  - python
-  - javascript
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/slatedocs/slate'>Documentation Powered by Slate</a>
+  - <a href='https://www.upfeat.com/'>Documentation by Upfeat</a>
 
 includes:
   - errors
@@ -21,80 +17,93 @@ code_clipboard: true
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to the Insert Coupon Blocks API! You can use our API to access Upfeat Coupon API endpoints, which can get information on various merchants, and promotions in our database.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
-
-This example API documentation page was created with [Slate](https://github.com/slatedocs/slate). Feel free to edit it and use it as a base for your own API's documentation.
+Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON responses, and uses standard HTTP response codes and authentication.
 
 # Authentication
 
-> To authorize, use this code:
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
+> To authorize, use this code to get jwt:
 
 ```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here" \
-  -H "Authorization: meowmeowmeow"
+# First, request a JSON Web Token (JWT)
+curl -X POST "https://coupon-api.upfeat.com/block-insert/auth" \
+  -H "Content-Type:application/json" \
+  --data '{"username": example_user,"password": example_password}'
+
+# Use the token string returned from auth server to make requests
+curl -X POST "https://coupon-api.upfeat.com/block-insert" \
+  -H "Content-Type:application/json" \
+  -H "Authorization: Bearer bearer_token" \
+  --data '{"article_html": html_snippet}'
 ```
 
-```javascript
-const kittn = require('kittn');
+> Make sure to replace `example_user` and `example_password` with your credential.
 
-let api = kittn.authorize('meowmeowmeow');
-```
+Authentication to the API is performed via bearer token Authentication. 
 
-> Make sure to replace `meowmeowmeow` with your API key.
+Before you make request to Insert Coupon Blocks API, you will need to obtain a JSON web token from auth server by including provided username and password in the payload.
+We will authenticate to your web server and will remain logged in for the duration of the action.
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+`Authorization: Bearer bearer_token`
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+# Insert Coupon Blocks
 
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
+## Create a Signed JWT Token
 
 ```shell
-curl "http://example.com/api/kittens" \
-  -H "Authorization: meowmeowmeow"
+curl -X POST "https://coupon-api.upfeat.com/block-insert/auth" \
+  -H "Content-Type:application/json" \
+  --data '{"username": example_user,"password": example_password}'
 ```
 
-```javascript
-const kittn = require('kittn');
+> The above command returns JSON structured like this:
 
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZvcmJlcyIsInBhc3N3b3JkIjoiNihQckE2bVdYOjMkXWooRCIsImlhdCI6MTYxODI1ODkwNywiZXhwIjoxNjE4MjgwNTA3fQ.SpnX4I0ydxBc-g5lVmrZ-GAr1YErxhIgnC2n6Lp61fM",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZvcmJlcyIsInBhc3N3b3JkIjoiNihQckE2bVdYOjMkXWooRCIsImlhdCI6MTYxODI1ODkwN30.K9U2ENxigV8lAFfefEmUg6umIR8tjNiUJeBBegMn6D4"
+}
+```
+
+This endpoint creates a token.
+
+### HTTP Request
+
+`POST https://coupon-api.upfeat.com/block-insert/auth`
+
+### JSON Body Parameters
+
+Parameter | Required | Type | Description
+--------- | ------- | ----- |-----------
+username | Yes | String | The username of the user requesting the token.
+password | Yes | String | The password of the user requesting the token.
+
+## Request Insert Coupon Blocks response
+
+```shell
+curl -X POST "https://coupon-api.upfeat.com/block-insert" \
+  -H "Content-Type:application/json" \
+  -H "Authorization: Bearer bearer_token" \
+  --data '{"article_html": "<article class=\"pay-wall-content content_5fc7dc3eb8e1fa000630ca4e current-page\" id=\"article-container-0\"><fbs-ad class=\"ntv-contentd\" position=\"ntv-contentd\" ad-id=\"ntv-contentd\" batched=\"\" display-called=\"\" style=\"\"><div id=\"ntv-contentd\" aria-hidden=\"true\" data-google-query-id=\"CL2S0LD72-8CFYmaAQodIQ0IBQ\">......</div></div></main></article>"}'
+```
+
+> To insert content into the passed article_html:
+
+```shell
+curl -X POST "https://coupon-api.upfeat.com/block-insert" \
+  -H "Content-Type:application/json" \
+  -H "Authorization: Bearer bearer_token" \
+  --data 
+  '{
+    "content_snippet": "<div> 
+                          Get more {{ merchant_name }} coupons:
+                          <a href=\"{{ coupon_page_url }}\"> 
+                            {{ promo_count }} {{ coupon_term }} available for up to {{ popular_discount_percentage }} off
+                          </a>
+                        </div>", 
+    "article_html": html_snippet
+   }'
 ```
 
 > The above command returns JSON structured like this:
@@ -102,140 +111,52 @@ let kittens = api.kittens.get();
 ```json
 [
   {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
+    "productBoxMatch": {
+      "selector": "#article-stream-0 > div:nth-child(2) > div:nth-child(2) > div:nth-child(3) > div:nth-child(1) > div:nth-child(14)",
+      "merchantInfo": {
+        "name": "eBay",
+        "coupon_page_url": "https://forbes.upfeat.com/coupons/ebay.com/",
+        "coupon_page_url_text": "eBay deals for at least 15% off",
+        "promo_count": 31,
+        "popular_discount_percentage": "15% Off",
+        "popular_discount_title": "eBay deals for at least 15% off"
+      }
+    },
   },
   {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
+    "productBoxMatch": {
+      "selector": "#article-stream-0 > div:nth-child(2) > div:nth-child(2) > div:nth-child(3) > div:nth-child(1) > div:nth-child(20)",
+      "merchantInfo": {
+            "name": "Walmart",
+            "coupon_page_url": "https://forbes.upfeat.com/coupons/walmart.com/",
+            "coupon_page_url_text": "Walmart sales and rollbacks for over 20% off",
+            "promo_count": 40,
+            "popular_discount_percentage": "20% Off",
+            "popular_discount_title": "Walmart sales and rollbacks for over 20% off"
+      }
+    },
+  },
+   …… 
+ ]
 ```
 
-This endpoint retrieves all kittens.
+This endpoint retrieves a returns a list of json responses for the product boxes which has a valid merchant.
+
+<aside class="warning">Note we send no response for a product box if we could not find a merchant in upfeat coupons</aside>
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+`POST https://coupon-api.upfeat.com/block-insert`
 
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2" \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
+### Headers
+Header | Description
 --------- | -----------
-ID | The ID of the kitten to retrieve
+Authorization | The token you retrieved by using username and password which prove who you are
 
-## Delete a Specific Kitten
+### JSON Body Parameters
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2" \
-  -X DELETE \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "deleted" : ":("
-}
-```
-
-This endpoint deletes a specific kitten.
-
-### HTTP Request
-
-`DELETE http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to delete
+Parameter | Required | Type | Description
+--------- | ------- | ----- |-----------
+article_html | Yes | String | The input should contains article html body element and we will detect product boxes.
+content_snippet | No | String | If the parameter is set, the content will be used to insert content into the passed article_html and will be included in the output. The content_snippet content should be html, with placeholders for where to put content. Supported placeholders are as follows: <ul><li>merchant_name: The merchant's name</li><li>coupon_term: The coupon term to use for the merchant</li><li>discount_count: The number of discounts available</li><li>coupon_page_url: The URL for the corresponding merchant's coupon page on Forbes</li><li>coupon_page_url_text: The SEO optimized text that should be used in the link to the Forbes coupon page</li><li>promo_count: The total count of promotions on the Forbes coupon page</li><li>popular_discount_percentage: The most popular discount percentage for the merchant</li><li>popular_discount_title:  The title of the currently most popular discount on the Forbes coupon page (ie. 10% off clothing)</li></ul>
 

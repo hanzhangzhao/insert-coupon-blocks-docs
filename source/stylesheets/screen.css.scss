@@ -78,6 +78,11 @@ html, body {
     margin-bottom: $logo-margin;
   }
 
+
+  .logo-wrapper {
+    padding: 15px 40px;
+  }
+
   &>.search {
     position: relative;
 
@@ -519,7 +524,7 @@ html, body {
   pre, blockquote {
     background-color: $code-bg;
     color: #fff;
-
+    padding: $code-annotation-padding 2em;
     margin: 0;
     width: $examples-width;
 
@@ -551,6 +556,9 @@ html, body {
       background-color: $code-annotation-bg;
       padding: $code-annotation-padding 2em;
       color: #eee;
+      border-radius: 5px;
+      border-top: 1px solid #000;
+      border-bottom: 1px solid #404040;
     }
   }
 }
